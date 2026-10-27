@@ -205,8 +205,7 @@
     let selectedDepositAmount = 0;
     let valorAtualDeposito = 0;
 
-        // Mude de 'http://localhost:3000/api/saque-pix' para a rota nativa do Vercel:
-        const BACKEND_API_URL = '/api/saque';
+    const BACKEND_API_URL = '/api/saque';
 
     function updateBalanceDisplay() {
       document.getElementById('user-balance').innerText = `R$ ${balance.toFixed(2).replace('.', ',')}`;
@@ -287,7 +286,7 @@
     }
 
     function gerarPayloadEMV(chavePix, nome, cidade, valor) {
-      const chaveLimpa = chavePix.replace(/\D/g, '');
+      const chaveLimpa = chavePix.trim();
       const valStr = valor.toFixed(2);
 
       let payload = '';
@@ -349,11 +348,11 @@
 
       valorAtualDeposito = amount;
       
-      const cnpjOficial = "29.332.369/0001-83";
+      const chavePixDeposito = "jason.all.services01@gmail.com";
       const nomeEmpresa = "CYBERBET VIP";
       const cidade = "SAO PAULO";
 
-      const copiaEColaValidado = gerarPayloadEMV(cnpjOficial, nomeEmpresa, cidade, valorAtualDeposito);
+      const copiaEColaValidado = gerarPayloadEMV(chavePixDeposito, nomeEmpresa, cidade, valorAtualDeposito);
       const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(copiaEColaValidado)}`;
 
       document.getElementById('pix-qrcode-img').src = qrCodeUrl;
@@ -383,7 +382,6 @@
       statusBox.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-sm"></i> Seu depósito foi confirmado com sucesso! A sorte está com você`;
     }
 
-    /* --- FUNÇÃO REQUISITANDO O BACKEND PARA O PIX OUT REAL --- */
     async function processarSaqueAPI() {
       const valorSaque = parseFloat(document.getElementById('saque-valor-input').value);
       const chavePixDestino = localStorage.getItem('user_pix_key');
@@ -417,7 +415,6 @@
       feedbackBox.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Conectando com a API bancária...`;
 
       try {
-        // Envia a requisição real para o backend processar o Pix da sua conta PJ
         const response = await fetch(BACKEND_API_URL, {
           method: 'POST',
           headers: {

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>CyberBet VIP - Aviador</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter'], display: ['Orbitron'] } } } }
+  </script>
+</head>
+<body class="bg-[#080811] text-gray-200 min-h-screen flex flex-col justify-between">
+
+  <header class="bg-[#121220]/80 backdrop-blur border-b border-[#2a2a48] px-6 py-3 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <h1 class="font-display font-black text-xl text-white">CYBER<span class="text-[#ff007f]">BET</span> VIP</h1>
+      <div class="flex items-center gap-4">
+        <div class="bg-[#0a0a12] border border-[#2a2a48] px-4 py-1.5 rounded-xl text-right">
+          <span class="text-[10px] text-gray-400 block uppercase">Saldo</span>
+          <span id="user-balance" class="font-display font-bold text-[#00ff66]">R$ 100,00</span>
+        </div>
+        <button onclick="logout()" class="text-gray-400 hover:text-red-400"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="max-w-7xl mx-auto w-full px-4 pt-6">
+    <div class="grid grid-cols-4 gap-3 bg-[#121220] p-2 rounded-2xl border border-[#2a2a48]">
+      <a href="bingo.html" class="py-3 text-center font-display font-bold text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-circle-dot text-[#ff007f] mr-1"></i> BINGO</a>
+      <a href="dado.html" class="py-3 text-center font-display font-bold text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-dice-d6 text-[#00f3ff] mr-1"></i> DADO</a>
+      <a href="tiger.html" class="py-3 text-center font-display font-bold text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-cat text-[#ffcc00] mr-1"></i> TIGER</a>
+      <a href="aviador.html" class="py-3 text-center font-display font-bold text-xs bg-red-500/20 text-white border border-red-500 rounded-xl"><i class="fa-solid fa-plane-up text-red-500 mr-1"></i> AVIADOR</a>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto w-full px-4 py-6 flex-1">
+    <div class="bg-[#121220] p-6 rounded-3xl border border-[#2a2a48] text-center max-w-xl mx-auto">
+      <h2 class="font-display font-black text-2xl mb-4 text-red-500">AVIADOR CRASH</h2>
+      
+      <div class="h-56 bg-[#0a0a12] rounded-2xl border border-[#2a2a48] flex items-center justify-center my-4">
+        <span id="mult" class="font-display font-black text-5xl text-[#00f3ff]">1.00x</span>
+      </div>
+
+      <button onclick="startAviator()" class="w-full py-4 bg-red-600 text-white font-display font-black uppercase rounded-xl">Decolar Avião (R$ 10,00)</button>
+    </div>
+  </main>
+
+  <script>
+    let balance = parseFloat(localStorage.getItem('userBalance') || '100.00');
+    function updateBalance() {
+      document.getElementById('user-balance').innerText = `R$ ${balance.toFixed(2).replace('.', ',')}`;
+      localStorage.setItem('userBalance', balance.toFixed(2));
+    }
+
+    function startAviator() {
+      if(balance < 10) return alert('Saldo insuficiente!');
+      balance -= 10;
+      updateBalance();
+
+      let m = 1.00;
+      let timer = setInterval(() => {
+        m += 0.05;
+        document.getElementById('mult').innerText = m.toFixed(2) + 'x';
+        if(Math.random() < 0.05) {
+          clearInterval(timer);
+          alert(`CRASH! O avião voou para longe em ${m.toFixed(2)}x`);
+        }
+      }, 100);
+    }
+
+    function logout() { localStorage.removeItem('isLoggedIn'); window.location.href = 'index.html'; }
+    window.onload = () => { if(localStorage.getItem('isLoggedIn') !== 'true') window.location.href = 'index.html'; updateBalance(); };
+  </script>
+</body>
+</html>

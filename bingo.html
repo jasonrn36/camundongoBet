@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>CyberBet VIP - Cyber Bingo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { sans: ['Inter'], display: ['Orbitron'] }, colors: { cyber: { bg: '#0a0a12', card: '#121220', border: '#2a2a48', pink: '#ff007f', purple: '#8a2be2', cyan: '#00f3ff', yellow: '#ffcc00', green: '#00ff66' } } } }
+    }
+  </script>
+</head>
+<body class="bg-[#080811] text-gray-200 min-h-screen flex flex-col justify-between">
+
+  <!-- HEADER -->
+  <header class="bg-[#121220]/80 backdrop-blur border-b border-[#2a2a48] px-6 py-3 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <h1 class="font-display font-black text-xl text-white">CYBER<span class="text-[#ff007f]">BET</span> VIP</h1>
+      <div class="flex items-center gap-4">
+        <div class="bg-[#0a0a12] border border-[#2a2a48] px-4 py-1.5 rounded-xl text-right">
+          <span class="text-[10px] text-gray-400 block uppercase">Saldo</span>
+          <span id="user-balance" class="font-display font-bold text-[#00ff66]">R$ 100,00</span>
+        </div>
+        <button onclick="logout()" class="text-gray-400 hover:text-red-400"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVEGAÇÃO -->
+  <nav class="max-w-7xl mx-auto w-full px-4 pt-6">
+    <div class="grid grid-cols-4 gap-3 bg-[#121220] p-2 rounded-2xl border border-[#2a2a48]">
+      <a href="bingo.html" class="py-3 text-center font-display font-bold text-xs bg-[#ff007f]/20 text-white border border-[#ff007f] rounded-xl"><i class="fa-solid fa-circle-dot text-[#ff007f] mr-1"></i> BINGO</a>
+      <a href="dado.html" class="py-3 text-center font-display font-bold text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-dice-d6 text-[#00f3ff] mr-1"></i> DADO</a>
+      <a href="tiger.html" class="py-3 text-center font-display font-bold text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-cat text-[#ffcc00] mr-1"></i> TIGER</a>
+      <a href="aviador.html" class="py-3 text-center font-display font-bold text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-plane-up text-red-500 mr-1"></i> AVIADOR</a>
+    </div>
+  </nav>
+
+  <!-- JOGO BINGO -->
+  <main class="max-w-7xl mx-auto w-full px-4 py-6 flex-1">
+    <div id="select-view" class="bg-[#121220] p-6 rounded-3xl border border-[#2a2a48]">
+      <h2 class="font-display font-black text-2xl text-center mb-4">ESCOLHA SUA CARTELA B-I-N-G-O</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6" id="cards-grid"></div>
+      <button id="btn-play" disabled onclick="startBingo()" class="w-full py-4 bg-gray-600 text-gray-400 font-display font-bold rounded-xl cursor-not-allowed uppercase">Selecione uma Cartela</button>
+    </div>
+
+    <div id="play-view" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-5 bg-[#121220] p-6 rounded-3xl border border-[#2a2a48] text-center">
+        <canvas id="globe-canvas" width="220" height="220" class="mx-auto my-4"></canvas>
+        <span class="text-xs text-gray-400 uppercase">Última Bola:</span>
+        <div id="latest-ball" class="font-display font-black text-3xl text-[#ff007f]">--</div>
+      </div>
+      <div class="lg:col-span-7 bg-[#121220] p-6 rounded-3xl border border-[#2a2a48]">
+        <div class="grid grid-cols-5 gap-2 text-center font-display font-black text-lg mb-3">
+          <span class="text-[#ff007f]">B</span><span class="text-[#00f3ff]">I</span><span class="text-[#ffcc00]">N</span><span class="text-[#00ff66]">G</span><span class="text-[#8a2be2]">O</span>
+        </div>
+        <div class="grid grid-cols-5 gap-2 text-center" id="active-card-grid"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let balance = parseFloat(localStorage.getItem('userBalance') || '100.00');
+    let selectedCard = null;
+    let cards = [];
+    let activeCard = null;
+
+    function updateBalanceDisplay() {
+      document.getElementById('user-balance').innerText = `R$ ${balance.toFixed(2).replace('.', ',')}`;
+      localStorage.setItem('userBalance', balance.toFixed(2));
+    }
+
+    function init() {
+      if(localStorage.getItem('isLoggedIn') !== 'true') window.location.href = 'index.html';
+      updateBalanceDisplay();
+      
+      const grid = document.getElementById('cards-grid');
+      grid.innerHTML = '';
+      for(let i=0; i<6; i++) {
+        let nums = [];
+        while(nums.length < 15) {
+          let r = Math.floor(Math.random() * 30) + 1;
+          if(!nums.includes(r)) nums.push(r);
+        }
+        cards.push(nums);
+        grid.innerHTML += `
+          <div onclick="selectCard(${i})" id="card-${i}" class="bg-[#0a0a12] p-4 rounded-2xl border border-[#2a2a48] cursor-pointer hover:border-[#ff007f]">
+            <span class="text-xs font-bold text-[#ff007f] block mb-2">CARTELA #${i+1}</span>
+            <div class="grid grid-cols-5 gap-1 text-center font-bold text-xs">${nums.map(n => `<div class="bg-[#121220] py-1 rounded">${n}</div>`).join('')}</div>
+          </div>
+        `;
+      }
+    }
+
+    function selectCard(idx) {
+      selectedCard = idx;
+      document.querySelectorAll('[id^="card-"]').forEach(el => el.classList.remove('border-[#ff007f]'));
+      document.getElementById(`card-${idx}`).classList.add('border-[#ff007f]');
+      const btn = document.getElementById('btn-play');
+      btn.disabled = false;
+      btn.className = "w-full py-4 bg-[#00ff66] text-black font-display font-black rounded-xl cursor-pointer uppercase";
+      btn.innerText = `Confirmar e Jogar (R$ 10,00)`;
+    }
+
+    function startBingo() {
+      if(balance < 10) return alert('Saldo insuficiente!');
+      balance -= 10;
+      updateBalanceDisplay();
+
+      activeCard = { nums: cards[selectedCard], marked: Array(15).fill(false) };
+      document.getElementById('select-view').classList.add('hidden');
+      document.getElementById('play-view').classList.remove('hidden');
+      
+      renderActiveCard();
+      let available = Array.from({length: 30}, (_, i) => i + 1);
+      
+      let timer = setInterval(() => {
+        if(available.length === 0) return clearInterval(timer);
+        let ball = available.splice(Math.floor(Math.random() * available.length), 1)[0];
+        document.getElementById('latest-ball').innerText = ball;
+
+        activeCard.nums.forEach((n, idx) => { if(n === ball) activeCard.marked[idx] = true; });
+        renderActiveCard();
+
+        if(activeCard.marked.every(Boolean)) {
+          clearInterval(timer);
+          alert('BINGO COMPLETO! Ganhou R$ 500,00!');
+          balance += 500;
+          updateBalanceDisplay();
+        }
+      }, 2500);
+    }
+
+    function renderActiveCard() {
+      document.getElementById('active-card-grid').innerHTML = activeCard.nums.map((n, i) => `
+        <div class="py-2.5 rounded-xl font-bold text-sm ${activeCard.marked[i] ? 'bg-[#ff007f] text-white' : 'bg-[#0a0a12] text-gray-300 border border-[#2a2a48]'}">${n}</div>
+      `).join('');
+    }
+
+    function logout() { localStorage.removeItem('isLoggedIn'); window.location.href = 'index.html'; }
+    window.onload = init;
+  </script>
+</body>
+</html>

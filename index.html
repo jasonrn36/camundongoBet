@@ -205,8 +205,8 @@
     let selectedDepositAmount = 0;
     let valorAtualDeposito = 0;
 
-    // URL do seu servidor backend (ex: 'https://seu-servidor.com/api/saque-pix' ou 'http://localhost:3000/api/saque-pix')
-    const BACKEND_API_URL = 'http://localhost:3000/api/saque-pix';
+        // Mude de 'http://localhost:3000/api/saque-pix' para a rota nativa do Vercel:
+        const BACKEND_API_URL = '/api/saque';
 
     function updateBalanceDisplay() {
       document.getElementById('user-balance').innerText = `R$ ${balance.toFixed(2).replace('.', ',')}`;

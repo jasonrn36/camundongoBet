@@ -50,14 +50,14 @@
   <main class="max-w-7xl mx-auto w-full px-4 py-6 flex-1">
     <div class="bg-[#121220] p-6 rounded-3xl border border-[#2a2a48] text-center max-w-xl mx-auto">
       <h2 class="font-display font-black text-2xl mb-4">Cyber Bingo VIP</h2>
-      <p class="text-sm text-gray-400 mb-6">Acesse seu perfil para gerenciar seus dados pessoais, chave Pix e realizar depósitos rápidos.</p>
+      <p class="text-sm text-gray-400 mb-6">Acesse seu perfil para gerenciar sua chave Pix, realizar depósitos e efetuar saques instantâneos.</p>
       <button onclick="openProfile()" class="px-6 py-3 bg-cyber-pink text-white font-display font-bold rounded-xl shadow-lg hover:brightness-110 transition">
         Abrir Painel do Jogador
       </button>
     </div>
   </main>
 
-  <!-- MODAL DE PERFIL, PAGAMENTOS E DEPÓSITO -->
+  <!-- MODAL DE PERFIL, CHAVE PIX, DEPÓSITO E SAQUE -->
   <div id="profile-modal" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
     <div class="w-full max-w-lg bg-[#121220] text-gray-200 border border-[#2a2a48] rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
       
@@ -71,10 +71,11 @@
       </h2>
 
       <!-- Abas Internas -->
-      <div class="flex gap-2 mb-6 border-b border-[#2a2a48] pb-3">
-        <button onclick="switchProfileTab('dados')" id="tab-btn-dados" class="px-4 py-2 rounded-xl text-xs font-display font-bold bg-cyber-pink text-white transition">Meu Perfil</button>
-        <button onclick="switchProfileTab('pagamentos')" id="tab-btn-pagamentos" class="px-4 py-2 rounded-xl text-xs font-display font-bold bg-white/5 text-gray-400 hover:text-white transition">Chave PIX</button>
-        <button onclick="switchProfileTab('deposito')" id="tab-btn-deposito" class="px-4 py-2 rounded-xl text-xs font-display font-bold bg-white/5 text-gray-400 hover:text-white transition">Depositar</button>
+      <div class="grid grid-cols-4 gap-1 mb-6 border-b border-[#2a2a48] pb-3 text-center">
+        <button onclick="switchProfileTab('dados')" id="tab-btn-dados" class="py-2 rounded-xl text-[11px] font-display font-bold bg-cyber-pink text-white transition">Perfil</button>
+        <button onclick="switchProfileTab('pagamentos')" id="tab-btn-pagamentos" class="py-2 rounded-xl text-[11px] font-display font-bold bg-white/5 text-gray-400 hover:text-white transition">Chave Pix</button>
+        <button onclick="switchProfileTab('deposito')" id="tab-btn-deposito" class="py-2 rounded-xl text-[11px] font-display font-bold bg-white/5 text-gray-400 hover:text-white transition">Depositar</button>
+        <button onclick="switchProfileTab('saque')" id="tab-btn-saque" class="py-2 rounded-xl text-[11px] font-display font-bold bg-white/5 text-gray-400 hover:text-white transition">Sacar</button>
       </div>
 
       <!-- SEÇÃO 1: PERFIL DO JOGADOR -->
@@ -98,7 +99,7 @@
         </form>
       </div>
 
-      <!-- SEÇÃO 2: PAGAMENTOS (CHAVE PIX DO USUÁRIO) -->
+      <!-- SEÇÃO 2: CHAVE PIX DO USUÁRIO -->
       <div id="profile-tab-pagamentos" class="hidden space-y-4">
         <form onsubmit="savePixData(event)" class="space-y-4">
           <div class="bg-cyber-cyan/10 border border-cyber-cyan/30 p-3.5 rounded-xl text-xs text-cyber-cyan">
@@ -118,7 +119,7 @@
         </form>
       </div>
 
-      <!-- SEÇÃO 3: DEPÓSITO COM STATUS DINÂMICO DE CONFIRMAÇÃO -->
+      <!-- SEÇÃO 3: DEPÓSITO -->
       <div id="profile-tab-deposito" class="hidden space-y-4">
         <p class="text-xs text-gray-400">Escolha um valor pré-definido ou digite outro valor para depositar via Pix:</p>
         
@@ -138,7 +139,6 @@
           Gerar Pix (QR Code & Copia e Cola)
         </button>
 
-        <!-- ÁREA DO QR CODE E STATUS DINÂMICO DE APROVAÇÃO -->
         <div id="pix-payment-container" class="hidden mt-4 p-4 bg-[#0a0a12] border border-cyber-green/40 rounded-2xl text-center space-y-3">
           <h3 class="font-display font-bold text-xs text-cyber-green uppercase">Escaneie o QR Code ou Copie o Código</h3>
           
@@ -158,7 +158,6 @@
             </div>
           </div>
 
-          <!-- MENSAGEM DINÂMICA DE STATUS DO DEPÓSITO -->
           <div id="deposit-status-box" class="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl text-yellow-400 text-xs font-semibold">
             <i class="fa-solid fa-clock mr-1 animate-spin"></i> Seu depósito será confirmado em até 24 Horas.
           </div>
@@ -169,17 +168,49 @@
         </div>
       </div>
 
+      <!-- SEÇÃO 4: SAQUE VIA PIX -->
+      <div id="profile-tab-saque" class="hidden space-y-4">
+        <div class="bg-cyber-pink/10 border border-cyber-pink/30 p-3.5 rounded-xl text-xs text-cyber-pink">
+          <i class="fa-solid fa-money-bill-transfer mr-1"></i> O valor será enviado diretamente para a chave Pix cadastrada no seu perfil.
+        </div>
+
+        <div class="bg-[#0a0a12] border border-[#2a2a48] p-4 rounded-xl flex justify-between items-center">
+          <span class="text-xs text-gray-400 uppercase font-bold">Saldo Disponível para Saque:</span>
+          <span id="saque-saldo-disponivel" class="font-display font-bold text-[#00ff66] text-base">R$ 0,02</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Valor do Saque (R$)</label>
+          <input type="number" id="saque-valor-input" step="0.01" min="0.01" placeholder="0.00" class="w-full bg-[#0a0a12] border border-[#2a2a48] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyber-pink">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Chave Pix de Destino</label>
+          <input type="text" id="saque-chave-destino" readonly class="w-full bg-[#0a0a12]/50 border border-[#2a2a48] rounded-xl px-4 py-3 text-sm text-gray-400 focus:outline-none cursor-not-allowed">
+          <span class="text-[10px] text-gray-500 mt-1 block">Para alterar a chave de saque, acesse a aba "Chave Pix".</span>
+        </div>
+
+        <button onclick="processarSaqueAPI()" id="btn-executar-saque" class="w-full py-3.5 bg-gradient-to-r from-cyber-pink to-cyber-purple text-white font-display font-black text-sm rounded-xl uppercase tracking-wider shadow-lg hover:brightness-110 transition mt-2">
+          Solicitar Saque via Pix
+        </button>
+
+        <div id="saque-feedback-box" class="hidden p-3 rounded-xl text-xs font-semibold text-center"></div>
+      </div>
+
     </div>
   </div>
 
   <script>
-    // Inicialização do saldo em R$ 0.02
     let balance = parseFloat(localStorage.getItem('userBalance') || '0.02');
     let selectedDepositAmount = 0;
     let valorAtualDeposito = 0;
 
+    // URL do seu servidor backend (ex: 'https://seu-servidor.com/api/saque-pix' ou 'http://localhost:3000/api/saque-pix')
+    const BACKEND_API_URL = 'http://localhost:3000/api/saque-pix';
+
     function updateBalanceDisplay() {
       document.getElementById('user-balance').innerText = `R$ ${balance.toFixed(2).replace('.', ',')}`;
+      document.getElementById('saque-saldo-disponivel').innerText = `R$ ${balance.toFixed(2).replace('.', ',')}`;
       localStorage.setItem('userBalance', balance.toFixed(2));
     }
 
@@ -188,7 +219,10 @@
       document.getElementById('p-fullname').value = localStorage.getItem('user_fullname') || '';
       document.getElementById('p-phone').value = localStorage.getItem('user_phone') || '';
       document.getElementById('pix-beneficiary').value = localStorage.getItem('user_pix_beneficiary') || '';
-      document.getElementById('pix-key').value = localStorage.getItem('user_pix_key') || '';
+      
+      const savedPixKey = localStorage.getItem('user_pix_key') || '';
+      document.getElementById('pix-key').value = savedPixKey;
+      document.getElementById('saque-chave-destino').value = savedPixKey || 'Nenhuma chave cadastrada!';
 
       document.getElementById('profile-modal').classList.remove('hidden');
     }
@@ -202,20 +236,26 @@
       document.getElementById('profile-tab-dados').classList.add('hidden');
       document.getElementById('profile-tab-pagamentos').classList.add('hidden');
       document.getElementById('profile-tab-deposito').classList.add('hidden');
+      document.getElementById('profile-tab-saque').classList.add('hidden');
 
-      document.getElementById('tab-btn-dados').className = "px-4 py-2 rounded-xl text-xs font-display font-bold bg-white/5 text-gray-400 hover:text-white transition";
-      document.getElementById('tab-btn-pagamentos').className = "px-4 py-2 rounded-xl text-xs font-display font-bold bg-white/5 text-gray-400 hover:text-white transition";
-      document.getElementById('tab-btn-deposito').className = "px-4 py-2 rounded-xl text-xs font-display font-bold bg-white/5 text-gray-400 hover:text-white transition";
+      document.getElementById('tab-btn-dados').className = "py-2 rounded-xl text-[11px] font-display font-bold bg-white/5 text-gray-400 hover:text-white transition";
+      document.getElementById('tab-btn-pagamentos').className = "py-2 rounded-xl text-[11px] font-display font-bold bg-white/5 text-gray-400 hover:text-white transition";
+      document.getElementById('tab-btn-deposito').className = "py-2 rounded-xl text-[11px] font-display font-bold bg-white/5 text-gray-400 hover:text-white transition";
+      document.getElementById('tab-btn-saque').className = "py-2 rounded-xl text-[11px] font-display font-bold bg-white/5 text-gray-400 hover:text-white transition";
 
       if(tabName === 'dados') {
         document.getElementById('profile-tab-dados').classList.remove('hidden');
-        document.getElementById('tab-btn-dados').className = "px-4 py-2 rounded-xl text-xs font-display font-bold bg-cyber-pink text-white transition";
+        document.getElementById('tab-btn-dados').className = "py-2 rounded-xl text-[11px] font-display font-bold bg-cyber-pink text-white transition";
       } else if(tabName === 'pagamentos') {
         document.getElementById('profile-tab-pagamentos').classList.remove('hidden');
-        document.getElementById('tab-btn-pagamentos').className = "px-4 py-2 rounded-xl text-xs font-display font-bold bg-cyber-cyan text-black transition";
+        document.getElementById('tab-btn-pagamentos').className = "py-2 rounded-xl text-[11px] font-display font-bold bg-cyber-cyan text-black transition";
       } else if(tabName === 'deposito') {
         document.getElementById('profile-tab-deposito').classList.remove('hidden');
-        document.getElementById('tab-btn-deposito').className = "px-4 py-2 rounded-xl text-xs font-display font-bold bg-cyber-green text-black transition";
+        document.getElementById('tab-btn-deposito').className = "py-2 rounded-xl text-[11px] font-display font-bold bg-cyber-green text-black transition";
+      } else if(tabName === 'saque') {
+        document.getElementById('profile-tab-saque').classList.remove('hidden');
+        document.getElementById('tab-btn-saque').className = "py-2 rounded-xl text-[11px] font-display font-bold bg-cyber-pink text-white transition";
+        document.getElementById('saque-chave-destino').value = localStorage.getItem('user_pix_key') || 'Nenhuma chave cadastrada!';
       }
     }
 
@@ -231,7 +271,7 @@
       e.preventDefault();
       localStorage.setItem('user_pix_beneficiary', document.getElementById('pix-beneficiary').value);
       localStorage.setItem('user_pix_key', document.getElementById('pix-key').value);
-      alert('Chave PIX e beneficiário salvos com sucesso!');
+      alert('Chave Pix e beneficiário salvos com sucesso!');
     }
 
     function selectDepositVal(val) {
@@ -246,7 +286,6 @@
       document.querySelectorAll('.deposit-btn').forEach(b => b.classList.remove('border-cyber-green', 'bg-cyber-green/20'));
     }
 
-    /* --- GERADOR DE PAYLOAD PIX EMV (PADRÃO BANCO CENTRAL) --- */
     function gerarPayloadEMV(chavePix, nome, cidade, valor) {
       const chaveLimpa = chavePix.replace(/\D/g, '');
       const valStr = valor.toFixed(2);
@@ -320,7 +359,6 @@
       document.getElementById('pix-qrcode-img').src = qrCodeUrl;
       document.getElementById('pix-copia-cola-input').value = copiaEColaValidado;
 
-      // Reseta a caixa de mensagem de status para o estado inicial (Aguardando)
       const statusBox = document.getElementById('deposit-status-box');
       statusBox.className = "p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl text-yellow-400 text-xs font-semibold";
       statusBox.innerHTML = `<i class="fa-solid fa-clock mr-1 animate-spin"></i> Seu depósito será confirmado em até 24 Horas.`;
@@ -336,19 +374,86 @@
       alert('Código Pix Copia e Cola copiado com sucesso!');
     }
 
-    // CONFIRMAÇÃO DO DEPÓSITO
     function simularAprovacao() {
       balance += valorAtualDeposito;
       updateBalanceDisplay();
 
-      // Transiciona a caixa de status para a mensagem de sucesso
       const statusBox = document.getElementById('deposit-status-box');
       statusBox.className = "p-3.5 bg-emerald-500/20 border border-emerald-500/50 rounded-xl text-emerald-400 text-xs font-bold animate-bounce";
       statusBox.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-sm"></i> Seu depósito foi confirmado com sucesso! A sorte está com você`;
     }
 
+    /* --- FUNÇÃO REQUISITANDO O BACKEND PARA O PIX OUT REAL --- */
+    async function processarSaqueAPI() {
+      const valorSaque = parseFloat(document.getElementById('saque-valor-input').value);
+      const chavePixDestino = localStorage.getItem('user_pix_key');
+      const beneficiario = localStorage.getItem('user_pix_beneficiary');
+      const feedbackBox = document.getElementById('saque-feedback-box');
+      const btnSacar = document.getElementById('btn-executar-saque');
+
+      feedbackBox.classList.remove('hidden');
+
+      if (!chavePixDestino || chavePixDestino.trim() === '') {
+        feedbackBox.className = "p-3 bg-red-500/20 border border-red-500/40 rounded-xl text-red-400 text-xs font-semibold text-center";
+        feedbackBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Cadastre uma chave Pix válida na aba "Chave Pix" antes de sacar.`;
+        return;
+      }
+
+      if (isNaN(valorSaque) || valorSaque <= 0) {
+        feedbackBox.className = "p-3 bg-red-500/20 border border-red-500/40 rounded-xl text-red-400 text-xs font-semibold text-center";
+        feedbackBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Digite um valor de saque válido.`;
+        return;
+      }
+
+      if (valorSaque > balance) {
+        feedbackBox.className = "p-3 bg-red-500/20 border border-red-500/40 rounded-xl text-red-400 text-xs font-semibold text-center";
+        feedbackBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Saldo insuficiente para realizar este saque.`;
+        return;
+      }
+
+      btnSacar.innerText = "Processando Saque via Pix...";
+      btnSacar.disabled = true;
+      feedbackBox.className = "p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl text-yellow-400 text-xs font-semibold text-center";
+      feedbackBox.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Conectando com a API bancária...`;
+
+      try {
+        // Envia a requisição real para o backend processar o Pix da sua conta PJ
+        const response = await fetch(BACKEND_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            valor: valorSaque,
+            chavePix: chavePixDestino,
+            beneficiario: beneficiario
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          balance -= valorSaque;
+          updateBalanceDisplay();
+
+          feedbackBox.className = "p-3.5 bg-emerald-500/20 border border-emerald-500/50 rounded-xl text-emerald-400 text-xs font-bold text-center animate-bounce";
+          feedbackBox.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-sm"></i> Saque de R$ ${valorSaque.toFixed(2)} efetuado com sucesso para ${chavePixDestino}! Transação: ${data.transactionId || 'Confirmada'}`;
+          document.getElementById('saque-valor-input').value = '';
+        } else {
+          feedbackBox.className = "p-3 bg-red-500/20 border border-red-500/40 rounded-xl text-red-400 text-xs font-semibold text-center";
+          feedbackBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Erro no saque: ${data.message || 'Falha ao processar a transferência no banco.'}`;
+        }
+      } catch (error) {
+        console.error('Erro de conexão:', error);
+        feedbackBox.className = "p-3 bg-red-500/20 border border-red-500/40 rounded-xl text-red-400 text-xs font-semibold text-center";
+        feedbackBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Não foi possível conectar ao servidor de saques. Verifique se o servidor backend está online.`;
+      } finally {
+        btnSacar.innerText = "Solicitar Saque via Pix";
+        btnSacar.disabled = false;
+      }
+    }
+
     window.onload = () => {
-      // Garante que o saldo seja resetado para 0.02 caso não haja registro prévio ou se estiver testando
       if(!localStorage.getItem('userBalance')) {
         localStorage.setItem('userBalance', '0.02');
         balance = 0.02;

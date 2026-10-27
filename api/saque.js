@@ -16,7 +16,7 @@ export default async function handler(req, res) {
   try {
     // 2. Leitura da variável de ambiente com o nome exato configurado no Vercel
     const API_TOKEN = process.env.CyberBetVip;
-    const API_URL = 'https://api.gateway-pagamentos.com/v1/pix/transfers';
+    const API_URL = 'https://api.infinitepay.io/v1/pix/transfers'; // ou o endpoint exato fornecido na documentação da InfinitePay
 
     if (!API_TOKEN) {
       console.error('Erro: Variável de ambiente CyberBetVip não configurada.');
